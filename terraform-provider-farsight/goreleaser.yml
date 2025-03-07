@@ -1,0 +1,27 @@
+project_name: terraform-provider-farsight
+
+builds:
+  - id: terraform-provider-farsight
+    main: ./main.go
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - amd64
+      - arm64
+
+archives:
+  - format: zip
+    name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+
+checksum:
+  name_template: "{{ .ProjectName }}_{{ .Version }}_checksums.txt"
+
+signs:
+  - artifacts: checksum
+    args: ["--detach-sign"]
+    signature: "${artifact}.sig"
+    cmd: gpg
+    env:
+      - GPG_FINGERPRINT

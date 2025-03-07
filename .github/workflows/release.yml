@@ -16,6 +16,9 @@ permissions:
 jobs:
   goreleaser:
     runs-on: ubuntu-latest
+    defaults:
+        run:
+            working-directory: terraform-provider-farsight
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -37,7 +40,6 @@ jobs:
           distribution: goreleaser
           version: "~> v2"
           args: release --clean
-          workdir: terraform-provider-farsight
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GPG_FINGERPRINT: ${{ steps.import_gpg.outputs.fingerprint }}
