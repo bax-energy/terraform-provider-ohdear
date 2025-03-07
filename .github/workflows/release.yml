@@ -32,5 +32,6 @@ jobs:
           distribution: goreleaser
           version: "~> v2"
           args: release --clean
+          workdir: terraform-provider-farsight
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
