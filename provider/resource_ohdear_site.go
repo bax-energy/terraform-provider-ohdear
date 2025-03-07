@@ -30,6 +30,7 @@ func resourceOhDearSite() *schema.Resource {
 			"team_id": {
 				Type:        schema.TypeString,
 				Optional:    true,
+				ForceNew:    true,
 				Description: "The ID of the team that owns the site.",
 			},
 			"checks": {
@@ -247,12 +248,19 @@ func resourceOhDearSiteCreate(ctx context.Context, d *schema.ResourceData, m int
 		"url": d.Get("url").(string),
 	}
 
-	d.Set("team_id", m.(*Config).teamID)
-	teamID, err := strconv.Atoi(m.(*Config).teamID)
-	if err != nil {
-		return diag.FromErr(fmt.Errorf("failed to convert team_id to integer: %s", err))
+	if v, ok := d.GetOk("team_id"); ok {
+		teamID, err := strconv.Atoi(v.(string))
+		if err != nil {
+			return diag.FromErr(fmt.Errorf("failed to convert team ID to integer: %s", err))
+		}
+		payload["team_id"] = teamID
+	} else {
+		teamID, err := strconv.Atoi(m.(*Config).teamID)
+		if err != nil {
+			return diag.FromErr(fmt.Errorf("failed to convert team ID to integer: %s", err))
+		}
+		payload["team_id"] = teamID
 	}
-	payload["team_id"] = teamID
 
 	payload["checks"] = buildChecksPayload(d)
 
