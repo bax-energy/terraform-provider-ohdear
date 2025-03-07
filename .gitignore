@@ -1,9 +1,4 @@
-example/variable.tf
-example/*.tfstate
+locals/*
 gpg*
-example/.terraform.lock.hcl
-example/.terraform/providers/example.com/local/farsight/0.1.0/windows_amd64/terraform-provider-farsight.exe
-local.md
 terraform-provider-farsight/Makefile
-terraform-provider-farsight/Readme.md
 terraform-provider-farsight/terraform-provider-farsight.exe
