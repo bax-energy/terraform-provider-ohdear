@@ -2,16 +2,14 @@
 name: goreleaser
 
 on:
-  pull_request:
   push:
+    branches:
+      - main
     tags:
       - "*"
 
 permissions:
   contents: write
-  # packages: write
-  # issues: write
-  # id-token: write
 
 jobs:
   goreleaser:
