@@ -33,6 +33,19 @@ func resourceOhDearSite() *schema.Resource {
 				ForceNew:    true,
 				Description: "The ID of the team that owns the site.",
 			},
+			"friendly_name": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "If you specify a friendly name we'll display this instead of the url.",
+			},
+			"tags": {
+				Type:        schema.TypeList,
+				Optional:    true,
+				Description: "We'll display these tags across our UI and will send them along when requesting sites via the API.",
+				Elem: &schema.Schema{
+					Type: schema.TypeString,
+				},
+			},
 			"checks": {
 				Type:        schema.TypeList,
 				MaxItems:    1,
@@ -225,17 +238,33 @@ func resourceOhDearSite() *schema.Resource {
 					},
 				},
 			},
-			"friendly_name": {
-				Type:        schema.TypeString,
-				Optional:    true,
-				Description: "If you specify a friendly name we'll display this instead of the url.",
-			},
-			"tags": {
+			"broken_links": {
 				Type:        schema.TypeList,
+				MaxItems:    1,
 				Optional:    true,
-				Description: "We'll display these tags across our UI and will send them along when requesting sites via the API.",
-				Elem: &schema.Schema{
-					Type: schema.TypeString,
+				Description: "broken_links configuration.",
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"crawler_headers": {
+							Type:        schema.TypeList,
+							Optional:    true,
+							Description: "A list of HTTP client headers to be sent with the requests.",
+							Elem: &schema.Resource{
+								Schema: map[string]*schema.Schema{
+									"name": {
+										Type:        schema.TypeString,
+										Required:    true,
+										Description: "The name of the HTTP header.",
+									},
+									"value": {
+										Type:        schema.TypeString,
+										Required:    true,
+										Description: "The value of the HTTP header.",
+									},
+								},
+							},
+						},
+					},
 				},
 			},
 		},
@@ -328,6 +357,24 @@ func resourceOhDearSiteCreate(ctx context.Context, d *schema.ResourceData, m int
 					})
 				}
 				payload["uptime_check_expected_response_headers"] = headerPayload
+			}
+		}
+	}
+	if brokenlunksConfig, ok := d.GetOk("broken_links"); ok {
+		uptimeList := brokenlunksConfig.([]interface{})
+		if len(uptimeList) > 0 {
+			uptimeMap := uptimeList[0].(map[string]any)
+			if v, ok := uptimeMap["crawler_headers"]; ok {
+				headers := v.([]interface{})
+				headerPayload := []map[string]string{}
+				for _, header := range headers {
+					headerMap := header.(map[string]interface{})
+					headerPayload = append(headerPayload, map[string]string{
+						"name":  headerMap["name"].(string),
+						"value": headerMap["value"].(string),
+					})
+				}
+				payload["crawler_headers"] = headerPayload
 			}
 		}
 	}
@@ -463,6 +510,24 @@ func resourceOhDearSiteUpdate(ctx context.Context, d *schema.ResourceData, m int
 					})
 				}
 				payload["uptime_check_expected_response_headers"] = headerPayload
+			}
+		}
+	}
+	if brokenlunksConfig, ok := d.GetOk("broken_links"); ok {
+		uptimeList := brokenlunksConfig.([]interface{})
+		if len(uptimeList) > 0 {
+			uptimeMap := uptimeList[0].(map[string]any)
+			if v, ok := uptimeMap["crawler_headers"]; ok {
+				headers := v.([]interface{})
+				headerPayload := []map[string]string{}
+				for _, header := range headers {
+					headerMap := header.(map[string]interface{})
+					headerPayload = append(headerPayload, map[string]string{
+						"name":  headerMap["name"].(string),
+						"value": headerMap["value"].(string),
+					})
+				}
+				payload["crawler_headers"] = headerPayload
 			}
 		}
 	}
