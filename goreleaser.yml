@@ -1,27 +1,42 @@
-project_name: terraform-provider-farsight
-
+version: 2
+before:
+  hooks:
+    - go mod tidy
 builds:
-  - id: terraform-provider-farsight
-    main: ./main.go
+  - env:
+      - CGO_ENABLED=0
+    mod_timestamp: '{{ .CommitTimestamp }}'
+    flags:
+      - -trimpath
     goos:
+      - freebsd
+      - windows
       - linux
       - darwin
-      - windows
     goarch:
       - amd64
+      - '386'
+      - arm
       - arm64
-
+    ignore:
+      - goos: darwin
+        goarch: '386'
+    binary: '{{ .ProjectName }}_v{{ .Version }}'
 archives:
   - format: zip
-    name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
-
+    name_template: '{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}'
 checksum:
-  name_template: "{{ .ProjectName }}_{{ .Version }}_checksums.txt"
-
+  name_template: '{{ .ProjectName }}_{{ .Version }}_SHA256SUMS'
+  algorithm: sha256
 signs:
   - artifacts: checksum
-    args: ["--detach-sign"]
-    signature: "${artifact}.sig"
-    cmd: gpg
-    env:
-      - GPG_FINGERPRINT
+    args:
+      - "--batch"
+      - "--local-user"
+      - "{{ .Env.GPG_FINGERPRINT }}" # set this environment variable for your signing key
+      - "--output"
+      - "${signature}"
+      - "--detach-sign"
+      - "${artifact}"
+release:
+  use_existing_draft: true
