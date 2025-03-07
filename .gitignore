@@ -1,4 +1,3 @@
 locals/*
 gpg*
-terraform-provider-farsight/Makefile
-terraform-provider-farsight/terraform-provider-farsight.exe
+terraform-provider-farsight.exe
