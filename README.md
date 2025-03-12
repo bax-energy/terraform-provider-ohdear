@@ -2,7 +2,7 @@
 
 To install this provider, copy and paste this code into your Terraform configuration. Then, run terraform init.act with the Oh Dear! platform directly from Terraform.
 
-## Terraform 0.13+
+### Terraform 0.13+
 
 
    ```hcl
@@ -17,7 +17,7 @@ To install this provider, copy and paste this code into your Terraform configura
    ```
 
 
-## Example Usage
+### Example Usage
 
 ```hcl
 provider "ohdear" {
@@ -27,13 +27,13 @@ provider "ohdear" {
 }
 ```
 
-# Schema
+### Schema
 
-## Required
+#### Required
 - **api_key** (String) Oh Dear API token. If not set, uses OHDEAR_TOKEN env var.
 - **team_id** (String) The default team ID to use for sitesIf not set, uses OHDEAR_TEAM_ID env var.
 
-## Optional
+#### Optional
 - **api_url** (String) Oh Dear API URL. If not set, uses OHDEAR_API_URL env var. Defaults to ```https://ohdear.app```.
 
 
@@ -69,13 +69,13 @@ resource "ohdear_site" "example2" {
 }
 ```
 
-## Schema
+### Schema
 
-### Required
+#### Required
 
 - `url` (String) - The URL of the site to be monitored.
 
-### Optional
+#### Optional
 
 - `team_id` (String) - The ID of the team that owns the site.
 - `friendly_name` (String) - If you specify a friendly name, we'll display this instead of the URL.
