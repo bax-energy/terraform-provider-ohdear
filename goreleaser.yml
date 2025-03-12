@@ -13,7 +13,7 @@ builds:
       - linux
     goarch:
       - amd64
-    binary: '{{ .ProjectName }}_v{{ .Version }}'
+    binary: 'terraform-provider-{{ .ProjectName }}_v{{ .Version }}'
 archives:
   - formats: zip
     name_template: 'terraform-provider-{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}'
