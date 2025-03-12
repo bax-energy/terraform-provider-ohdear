@@ -1,4 +1,5 @@
 version: 2
+project_name: ohdear
 before:
   hooks:
     - go mod tidy
@@ -9,24 +10,15 @@ builds:
     flags:
       - -trimpath
     goos:
-      - freebsd
-      - windows
       - linux
-      - darwin
     goarch:
       - amd64
-      - '386'
-      - arm
-      - arm64
-    ignore:
-      - goos: darwin
-        goarch: '386'
     binary: '{{ .ProjectName }}_v{{ .Version }}'
 archives:
   - formats: zip
-    name_template: '{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}'
+    name_template: 'terraform-provider-{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}'
 checksum:
-  name_template: '{{ .ProjectName }}_{{ .Version }}_SHA256SUMS'
+  name_template: 'terraform-provider-{{ .ProjectName }}_{{ .Version }}_SHA256SUMS'
   algorithm: sha256
 signs:
   - artifacts: checksum
