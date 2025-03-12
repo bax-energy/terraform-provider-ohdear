@@ -36,7 +36,7 @@ func Provider() *schema.Provider {
 			},
 		},
 		ResourcesMap: map[string]*schema.Resource{
-			"farsight_ohdear_site": resourceOhDearSite(),
+			"ohdear_site": resourceSite(),
 		},
 		ConfigureContextFunc: providerConfigure,
 	}

@@ -13,12 +13,12 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 )
 
-func resourceOhDearSite() *schema.Resource {
+func resourceSite() *schema.Resource {
 	return &schema.Resource{
-		CreateContext: resourceOhDearSiteCreate,
-		ReadContext:   resourceOhDearSiteRead,
-		UpdateContext: resourceOhDearSiteUpdate,
-		DeleteContext: resourceOhDearSiteDelete,
+		CreateContext: resourceSiteCreate,
+		ReadContext:   resourceSiteRead,
+		UpdateContext: resourceSiteUpdate,
+		DeleteContext: resourceSiteDelete,
 
 		Schema: map[string]*schema.Schema{
 			"url": {
@@ -271,7 +271,7 @@ func resourceOhDearSite() *schema.Resource {
 	}
 }
 
-func resourceOhDearSiteCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+func resourceSiteCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 
 	payload := map[string]any{
 		"url": d.Get("url").(string),
@@ -429,15 +429,15 @@ func resourceOhDearSiteCreate(ctx context.Context, d *schema.ResourceData, m int
 		return diag.FromErr(fmt.Errorf("API response does not contain a valid ID"))
 	}
 
-	return resourceOhDearSiteRead(ctx, d, m)
+	return resourceSiteRead(ctx, d, m)
 }
 
-func resourceOhDearSiteRead(_ context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+func resourceSiteRead(_ context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	// Implementa la logica di lettura della risorsa qui
 	return diag.Diagnostics{}
 }
 
-func resourceOhDearSiteUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+func resourceSiteUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 
 	payload := map[string]any{
 		"url": d.Get("url").(string),
@@ -571,10 +571,10 @@ func resourceOhDearSiteUpdate(ctx context.Context, d *schema.ResourceData, m int
 		return diag.FromErr(fmt.Errorf("API returned errors: %s", errMsg))
 	}
 
-	return resourceOhDearSiteRead(ctx, d, m)
+	return resourceSiteRead(ctx, d, m)
 }
 
-func resourceOhDearSiteDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+func resourceSiteDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	config := m.(*Config)
 
 	req, err := http.NewRequest("DELETE", fmt.Sprintf("%s/api/sites/%s", config.APIURL, d.Id()), nil)
