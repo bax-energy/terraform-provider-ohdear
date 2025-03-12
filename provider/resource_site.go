@@ -8,6 +8,8 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/hashicorp/go-retryablehttp"
+
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
@@ -393,7 +395,9 @@ func resourceSiteCreate(ctx context.Context, d *schema.ResourceData, m interface
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", m.(*Config).APIKey))
 
-	client := &http.Client{}
+	retryClient := retryablehttp.NewClient()
+	retryClient.RetryMax = 10
+	client := retryClient.StandardClient() // *http.Client
 	resp, err := client.Do(req)
 	if err != nil {
 		return diag.FromErr(fmt.Errorf("failed to create site: %s", err))
@@ -415,7 +419,7 @@ func resourceSiteCreate(ctx context.Context, d *schema.ResourceData, m interface
 				errMsg += fmt.Sprintf("\n- %s: %s", field, msg)
 			}
 		}
-		return diag.FromErr(fmt.Errorf("API returned errors: %s", errMsg))
+		return diag.FromErr(fmt.Errorf("API returned errors: %s Status Code: %d\n Response body: %s", errMsg, resp.StatusCode, apiErrResp.Message))
 	}
 
 	var result map[string]interface{}
@@ -546,7 +550,9 @@ func resourceSiteUpdate(ctx context.Context, d *schema.ResourceData, m interface
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", m.(*Config).APIKey))
 
-	client := &http.Client{}
+	retryClient := retryablehttp.NewClient()
+	retryClient.RetryMax = 10
+	client := retryClient.StandardClient() // *http.Client
 	resp, err := client.Do(req)
 	if err != nil {
 		return diag.FromErr(fmt.Errorf("failed to update site: %s", err))
@@ -568,7 +574,7 @@ func resourceSiteUpdate(ctx context.Context, d *schema.ResourceData, m interface
 				errMsg += fmt.Sprintf("\n- %s: %s", field, msg)
 			}
 		}
-		return diag.FromErr(fmt.Errorf("API returned errors: %s", errMsg))
+		return diag.FromErr(fmt.Errorf("API returned errors: %s Status Code: %d\n Response body: %s", errMsg, resp.StatusCode, apiErrResp.Message))
 	}
 
 	return resourceSiteRead(ctx, d, m)
@@ -586,7 +592,9 @@ func resourceSiteDelete(ctx context.Context, d *schema.ResourceData, m interface
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", config.APIKey))
 
-	client := &http.Client{}
+	retryClient := retryablehttp.NewClient()
+	retryClient.RetryMax = 10
+	client := retryClient.StandardClient() // *http.Client
 	resp, err := client.Do(req)
 	if err != nil {
 		return diag.FromErr(err)
@@ -608,7 +616,7 @@ func resourceSiteDelete(ctx context.Context, d *schema.ResourceData, m interface
 				errMsg += fmt.Sprintf("\n- %s: %s", field, msg)
 			}
 		}
-		return diag.FromErr(fmt.Errorf("API returned errors: %s", errMsg))
+		return diag.FromErr(fmt.Errorf("API returned errors: %s Status Code: %d\n Response body: %s", errMsg, resp.StatusCode, apiErrResp.Message))
 	}
 
 	d.SetId("")
