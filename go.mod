@@ -1,4 +1,4 @@
-module terraform-provider-farsight
+module terraform-provider-ohdear
 
 go 1.18
 
