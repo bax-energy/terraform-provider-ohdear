@@ -39,7 +39,7 @@ provider "ohdear" {
 
 # ohdear_site (Resource)
 
-ohdear_site manages a site in Oh Dear.
+ohdear_site manages a site in Oh Dear via [their API](https://ohdear.app/docs/integrations/the-oh-dear-api#sites).
 
 Example Usage
 
