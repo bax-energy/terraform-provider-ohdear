@@ -601,7 +601,7 @@ func resourceSiteDelete(ctx context.Context, d *schema.ResourceData, m interface
 	}
 	defer resp.Body.Close()
 
-	if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusNoContent {
+	if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusNoContent && resp.StatusCode != http.StatusNotFound {
 		var apiErrResp struct {
 			Message string              `json:"message"`
 			Errors  map[string][]string `json:"errors"`
