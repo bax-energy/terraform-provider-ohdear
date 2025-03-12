@@ -32,7 +32,15 @@ jobs:
         with:
           distribution: goreleaser
           version: "~> v2"
-          args: release --clean
+          args: release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GPG_FINGERPRINT: ${{ steps.import_gpg.outputs.fingerprint }}
+      
+      - name: Terraform Cloud Private Provider Publish
+        uses: thechrisjohnson/terraform-cloud-provider-publish@v1.5
+        with:
+            organization-name: bax-energy
+            organization-api-token: ${{ secrets.TF_CLOUD_TOKEN }}
+            provider-directory: dist
+            gpg-key: ${{ secrets.GPG_PUBLIC_KEY }}

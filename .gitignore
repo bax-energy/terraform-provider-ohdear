@@ -1,3 +1,5 @@
 locals/*
 gpg*
 terraform-provider-farsight.exe
+Makefile
+run.ps1
