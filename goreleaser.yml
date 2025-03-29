@@ -11,8 +11,10 @@ builds:
       - -trimpath
     goos:
       - linux
+      - darwin # macOS
     goarch:
       - amd64
+      - arm64
     binary: 'terraform-provider-{{ .ProjectName }}_v{{ .Version }}'
 archives:
   - formats: zip
