@@ -1,5 +1,7 @@
+# Copyright (c) BAXENERGY ITALIA SRL
+# SPDX-License-Identifier: MIT
+
 version: 2
-project_name: ohdear
 before:
   hooks:
     - go mod tidy
@@ -9,18 +11,30 @@ builds:
     mod_timestamp: '{{ .CommitTimestamp }}'
     flags:
       - -trimpath
+    ldflags:
+      - '-s -w -X main.version={{.Version}} -X main.commit={{.Commit}}'
     goos:
+      - freebsd
+      - windows
       - linux
-      - darwin # macOS
+      - darwin
     goarch:
       - amd64
+      - '386'
+      - arm
       - arm64
-    binary: 'terraform-provider-{{ .ProjectName }}_v{{ .Version }}'
+    ignore:
+      - goos: darwin
+        goarch: '386'
+    binary: '{{ .ProjectName }}_v{{ .Version }}'
 archives:
   - formats: zip
-    name_template: 'terraform-provider-{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}'
+    name_template: '{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}'
 checksum:
-  name_template: 'terraform-provider-{{ .ProjectName }}_{{ .Version }}_SHA256SUMS'
+  extra_files:
+    - glob: 'terraform-registry-manifest.json'
+      name_template: '{{ .ProjectName }}_{{ .Version }}_manifest.json'
+  name_template: '{{ .ProjectName }}_{{ .Version }}_SHA256SUMS'
   algorithm: sha256
 signs:
   - artifacts: checksum
@@ -33,4 +47,15 @@ signs:
       - "--detach-sign"
       - "${artifact}"
 release:
-  use_existing_draft: true
+  extra_files:
+    - glob: 'terraform-registry-manifest.json'
+      name_template: '{{ .ProjectName }}_{{ .Version }}_manifest.json'
+  # If you want to manually examine the release before its live, uncomment this line:
+  # draft: true
+changelog:
+  use: git
+  sort: asc
+  filters:
+    include:
+      - '^feat:'
+      - '^fix:'

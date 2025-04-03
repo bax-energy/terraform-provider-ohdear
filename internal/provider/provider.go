@@ -1,3 +1,6 @@
+// Copyright (c) BAXENERGY ITALIA SRL
+// SPDX-License-Identifier: MIT
+
 package provider
 
 import (

@@ -1,7 +1,10 @@
+// Copyright (c) BAXENERGY ITALIA SRL
+// SPDX-License-Identifier: MIT
+
 package main
 
 import (
-	"terraform-provider-ohdear/provider"
+	"terraform-provider-ohdear/internal/provider"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/plugin"
 )
