@@ -275,18 +275,31 @@ func resourceSite() *schema.Resource {
 
 func resourceSiteCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 
+	url, ok := d.Get("url").(string)
+	if !ok {
+		return diag.Errorf("invalid type assertion for url")
+	}
+
 	payload := map[string]any{
-		"url": d.Get("url").(string),
+		"url": url,
 	}
 
 	if v, ok := d.GetOk("team_id"); ok {
-		teamID, err := strconv.Atoi(v.(string))
+		teamIDStr, ok := v.(string)
+		if !ok {
+			return diag.Errorf("invalid type assertion for team_id")
+		}
+		teamID, err := strconv.Atoi(teamIDStr)
 		if err != nil {
 			return diag.FromErr(fmt.Errorf("failed to convert team ID to integer: %s", err))
 		}
 		payload["team_id"] = teamID
 	} else {
-		teamID, err := strconv.Atoi(m.(*Config).teamID)
+		config, ok := m.(*Config)
+		if !ok {
+			return diag.Errorf("invalid type assertion for Config")
+		}
+		teamID, err := strconv.Atoi(config.teamID)
 		if err != nil {
 			return diag.FromErr(fmt.Errorf("failed to convert team ID to integer: %s", err))
 		}
@@ -296,10 +309,18 @@ func resourceSiteCreate(ctx context.Context, d *schema.ResourceData, m interface
 	payload["checks"] = buildChecksPayload(d)
 
 	if v, ok := d.GetOk("friendly_name"); ok {
-		payload["friendly_name"] = v.(string)
+		friendlyName, ok := v.(string)
+		if !ok {
+			return diag.Errorf("invalid type assertion for friendly_name")
+		}
+		payload["friendly_name"] = friendlyName
 	}
 	if v, ok := d.GetOk("tags"); ok {
-		payload["tags"] = v.([]interface{})
+		tags, ok := v.([]interface{})
+		if !ok {
+			return diag.Errorf("invalid type assertion for tags")
+		}
+		payload["tags"] = tags
 	}
 
 	if uptimeConfig, ok := d.GetOk("uptime"); ok {
