@@ -53,9 +53,4 @@ release:
   # If you want to manually examine the release before its live, uncomment this line:
   # draft: true
 changelog:
-  use: git
-  sort: asc
-  filters:
-    include:
-      - '^feat:'
-      - '^fix:'
+  disable: true
