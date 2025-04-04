@@ -4,7 +4,10 @@ go 1.23
 
 toolchain go1.24.1
 
-require github.com/hashicorp/terraform-plugin-sdk/v2 v2.10.0
+require (
+	github.com/go-resty/resty/v2 v2.16.5
+	github.com/hashicorp/terraform-plugin-sdk/v2 v2.10.0
+)
 
 require (
 	github.com/apparentlymart/go-textseg/v15 v15.0.0 // indirect

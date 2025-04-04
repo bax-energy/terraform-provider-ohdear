@@ -1,6 +1,3 @@
-// Copyright (c) BAXENERGY ITALIA SRL
-// SPDX-License-Identifier: MIT
-
 package provider
 
 import (
@@ -291,7 +288,7 @@ func resourceSiteCreate(ctx context.Context, d *schema.ResourceData, m interface
 	} else {
 		teamID, err := strconv.Atoi(m.(*Config).teamID)
 		if err != nil {
-			return diag.FromErr(fmt.Errorf("failed to convert team ID to integer: %s", err))
+			return diagErrorf(err, "Could not remove check to site in Oh Dear")
 		}
 		payload["team_id"] = teamID
 	}
