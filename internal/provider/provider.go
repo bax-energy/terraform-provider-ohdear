@@ -59,7 +59,7 @@ func Provider() *schema.Provider {
 
 func providerConfigure(_ context.Context, d *schema.ResourceData) (interface{}, diag.Diagnostics) {
 	ua := fmt.Sprintf(
-		"terraform-provider-ohdear/%s (https://github.com/articulate/terraform-provider-ohdear)",
+		"terraform-provider-ohdear/%s (https://github.com/bax-energy/terraform-provider-ohdear)",
 		runtime.Version,
 	)
 	client := ohdear.NewClient(d.Get("api_url").(string), d.Get("api_token").(string))

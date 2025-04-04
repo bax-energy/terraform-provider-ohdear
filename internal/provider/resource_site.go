@@ -1,14 +1,8 @@
 package provider
 
 import (
-	"bytes"
 	"context"
-	"encoding/json"
 	"fmt"
-	"net/http"
-	"strconv"
-
-	"github.com/hashicorp/go-retryablehttp"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -18,9 +12,9 @@ import (
 func resourceSite() *schema.Resource {
 	return &schema.Resource{
 		CreateContext: resourceSiteCreate,
-		ReadContext:   resourceSiteRead,
-		UpdateContext: resourceSiteUpdate,
-		DeleteContext: resourceSiteDelete,
+		// ReadContext:   resourceSiteRead,
+		// UpdateContext: resourceSiteUpdate,
+		// DeleteContext: resourceSiteDelete,
 
 		Schema: map[string]*schema.Schema{
 			"url": {
@@ -270,355 +264,246 @@ func resourceSite() *schema.Resource {
 				},
 			},
 		},
+		// CustomizeDiff: resourceOhdearSiteDiff,
+		Importer: &schema.ResourceImporter{
+			StateContext: schema.ImportStatePassthroughContext,
+		},
 	}
 }
 
 func resourceSiteCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 
-	payload := map[string]any{
-		"url": d.Get("url").(string),
-	}
+	client := m.(*Config).client
 
-	if v, ok := d.GetOk("team_id"); ok {
-		teamID, err := strconv.Atoi(v.(string))
-		if err != nil {
-			return diag.FromErr(fmt.Errorf("failed to convert team ID to integer: %s", err))
-		}
-		payload["team_id"] = teamID
-	} else {
-		teamID, err := strconv.Atoi(m.(*Config).teamID)
-		if err != nil {
-			return diagErrorf(err, "Could not remove check to site in Oh Dear")
-		}
-		payload["team_id"] = teamID
-	}
+	payload := BuildPayload(d)
 
-	payload["checks"] = buildChecksPayload(d)
-
-	if v, ok := d.GetOk("friendly_name"); ok {
-		payload["friendly_name"] = v.(string)
-	}
-	if v, ok := d.GetOk("tags"); ok {
-		payload["tags"] = v.([]interface{})
-	}
-
-	if uptimeConfig, ok := d.GetOk("uptime"); ok {
-		uptimeList := uptimeConfig.([]interface{})
-		if len(uptimeList) > 0 {
-			uptimeMap := uptimeList[0].(map[string]any)
-			if v, ok := uptimeMap["check_valid_status_codes"]; ok {
-				payload["uptime_check_valid_status_codes"] = v.([]any)
-			} else {
-				payload["uptime_check_valid_status_codes"] = []interface{}{"2*"}
-			}
-			if v, ok := uptimeMap["http_client_headers"]; ok {
-				headers := v.([]interface{})
-				headerPayload := []map[string]string{}
-				for _, header := range headers {
-					headerMap := header.(map[string]interface{})
-					headerPayload = append(headerPayload, map[string]string{
-						"name":  headerMap["name"].(string),
-						"value": headerMap["value"].(string),
-					})
-				}
-				payload["http_client_headers"] = headerPayload
-			}
-			if v, ok := uptimeMap["check_location"]; ok {
-				payload["uptime_check_location"] = v.(string)
-			}
-			if v, ok := uptimeMap["check_failed_notification_threshold"]; ok {
-				payload["uptime_check_failed_notification_threshold"] = v.(int)
-			}
-			if v, ok := uptimeMap["check_http_verb"]; ok {
-				payload["uptime_check_http_verb"] = v.(string)
-			}
-			if v, ok := uptimeMap["check_timeout"]; ok {
-				payload["uptime_check_timeout"] = v.(int)
-			}
-			if v, ok := uptimeMap["check_max_redirect_count"]; ok {
-				payload["uptime_check_max_redirect_count"] = v.(int)
-			}
-			if v, ok := uptimeMap["check_payload"]; ok {
-				payload["uptime_check_payload"] = v.([]interface{})
-			}
-			if v, ok := uptimeMap["check_look_for_string"]; ok {
-				payload["uptime_check_look_for_string"] = v.(string)
-			}
-			if v, ok := uptimeMap["check_absent_string"]; ok {
-				payload["uptime_check_absent_string"] = v.(string)
-			}
-			if v, ok := uptimeMap["check_expected_response_headers"]; ok {
-				headers := v.([]interface{})
-				headerPayload := []map[string]string{}
-				for _, header := range headers {
-					headerMap := header.(map[string]interface{})
-					headerPayload = append(headerPayload, map[string]string{
-						"name":      headerMap["name"].(string),
-						"condition": headerMap["condition"].(string),
-						"value":     headerMap["value"].(string),
-					})
-				}
-				payload["uptime_check_expected_response_headers"] = headerPayload
-			}
-		}
-	}
-	if brokenlunksConfig, ok := d.GetOk("broken_links"); ok {
-		uptimeList := brokenlunksConfig.([]interface{})
-		if len(uptimeList) > 0 {
-			uptimeMap := uptimeList[0].(map[string]any)
-			if v, ok := uptimeMap["crawler_headers"]; ok {
-				headers := v.([]interface{})
-				headerPayload := []map[string]string{}
-				for _, header := range headers {
-					headerMap := header.(map[string]interface{})
-					headerPayload = append(headerPayload, map[string]string{
-						"name":  headerMap["name"].(string),
-						"value": headerMap["value"].(string),
-					})
-				}
-				payload["crawler_headers"] = headerPayload
-			}
-		}
-	}
-
-	jsonPayload, err := json.Marshal(payload)
+	site, err := client.AddSite(d.Get("url").(string), d.Get("team_id").(string), payload)
 	if err != nil {
-		return diag.FromErr(fmt.Errorf("failed to marshal payload: %s", err))
+		return diagErrorf(err, "Could not add site to Oh Dear")
 	}
 
-	req, err := http.NewRequest("POST", fmt.Sprintf("%s/api/sites", m.(*Config).APIURL), bytes.NewBuffer(jsonPayload))
-	if err != nil {
-		return diag.FromErr(fmt.Errorf("failed to create request: %s", err))
-	}
+	d.SetId(fmt.Sprintf("%d", int(site.ID)))
 
-	req.Header.Set("Accept", "application/json")
-	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", m.(*Config).APIKey))
-
-	retryClient := retryablehttp.NewClient()
-	retryClient.RetryMax = 10
-	client := retryClient.StandardClient() // *http.Client
-	resp, err := client.Do(req)
-	if err != nil {
-		return diag.FromErr(fmt.Errorf("failed to create site: %s", err))
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusCreated {
-		var apiErrResp struct {
-			Message string              `json:"message"`
-			Errors  map[string][]string `json:"errors"`
-		}
-		if err := json.NewDecoder(resp.Body).Decode(&apiErrResp); err != nil {
-			return diag.FromErr(fmt.Errorf("failed to create site, status code %d, unable to parse error response: %s", resp.StatusCode, err))
-		}
-
-		errMsg := "API errors:"
-		for field, messages := range apiErrResp.Errors {
-			for _, msg := range messages {
-				errMsg += fmt.Sprintf("\n- %s: %s", field, msg)
-			}
-		}
-		return diag.FromErr(fmt.Errorf("API returned errors: %s Status Code: %d\n Response body: %s", errMsg, resp.StatusCode, apiErrResp.Message))
-	}
-
-	var result map[string]interface{}
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return diag.FromErr(fmt.Errorf("failed to parse response: %s", err))
-	}
-
-	if id, ok := result["id"].(float64); ok {
-		d.SetId(fmt.Sprintf("%d", int(id)))
-	} else {
-		return diag.FromErr(fmt.Errorf("API response does not contain a valid ID"))
-	}
-
-	return resourceSiteRead(ctx, d, m)
-}
-
-func resourceSiteRead(_ context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	// Implementa la logica di lettura della risorsa qui
-	return diag.Diagnostics{}
-}
-
-func resourceSiteUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-
-	payload := map[string]any{
-		"url": d.Get("url").(string),
-	}
-
-	payload["checks"] = buildChecksPayload(d)
-
-	if v, ok := d.GetOk("friendly_name"); ok {
-		payload["friendly_name"] = v.(string)
-	}
-	if v, ok := d.GetOk("tags"); ok {
-		payload["tags"] = v.([]interface{})
-	}
-
-	if uptimeConfig, ok := d.GetOk("uptime"); ok {
-		uptimeList := uptimeConfig.([]interface{})
-		if len(uptimeList) > 0 {
-			uptimeMap := uptimeList[0].(map[string]interface{})
-			if v, ok := uptimeMap["check_valid_status_codes"]; ok {
-				payload["uptime_check_valid_status_codes"] = v.([]interface{})
-			} else {
-				payload["uptime_check_valid_status_codes"] = []interface{}{"2*"}
-			}
-
-			if v, ok := uptimeMap["http_client_headers"]; ok {
-				headers := v.([]interface{})
-				headerPayload := []map[string]string{}
-				for _, header := range headers {
-					headerMap := header.(map[string]interface{})
-					headerPayload = append(headerPayload, map[string]string{
-						"name":  headerMap["name"].(string),
-						"value": headerMap["value"].(string),
-					})
-				}
-				payload["http_client_headers"] = headerPayload
-			}
-			if v, ok := uptimeMap["check_location"]; ok {
-				payload["uptime_check_location"] = v.(string)
-			}
-			if v, ok := uptimeMap["check_failed_notification_threshold"]; ok {
-				payload["uptime_check_failed_notification_threshold"] = v.(int)
-			}
-			if v, ok := uptimeMap["check_http_verb"]; ok {
-				payload["uptime_check_http_verb"] = v.(string)
-			}
-			if v, ok := uptimeMap["check_timeout"]; ok {
-				payload["uptime_check_timeout"] = v.(int)
-			}
-			if v, ok := uptimeMap["check_max_redirect_count"]; ok {
-				payload["uptime_check_max_redirect_count"] = v.(int)
-			}
-			if v, ok := uptimeMap["check_payload"]; ok {
-				payload["uptime_check_payload"] = v.([]interface{})
-			}
-			if v, ok := uptimeMap["check_look_for_string"]; ok {
-				payload["uptime_check_look_for_string"] = v.(string)
-			}
-			if v, ok := uptimeMap["check_absent_string"]; ok {
-				payload["uptime_check_absent_string"] = v.(string)
-			}
-			if v, ok := uptimeMap["check_expected_response_headers"]; ok {
-				headers := v.([]interface{})
-				headerPayload := []map[string]string{}
-				for _, header := range headers {
-					headerMap := header.(map[string]interface{})
-					headerPayload = append(headerPayload, map[string]string{
-						"name":      headerMap["name"].(string),
-						"condition": headerMap["condition"].(string),
-						"value":     headerMap["value"].(string),
-					})
-				}
-				payload["uptime_check_expected_response_headers"] = headerPayload
-			}
-		}
-	}
-	if brokenlunksConfig, ok := d.GetOk("broken_links"); ok {
-		uptimeList := brokenlunksConfig.([]interface{})
-		if len(uptimeList) > 0 {
-			uptimeMap := uptimeList[0].(map[string]any)
-			if v, ok := uptimeMap["crawler_headers"]; ok {
-				headers := v.([]interface{})
-				headerPayload := []map[string]string{}
-				for _, header := range headers {
-					headerMap := header.(map[string]interface{})
-					headerPayload = append(headerPayload, map[string]string{
-						"name":  headerMap["name"].(string),
-						"value": headerMap["value"].(string),
-					})
-				}
-				payload["crawler_headers"] = headerPayload
-			}
-		}
-	}
-
-	jsonPayload, err := json.Marshal(payload)
-	if err != nil {
-		return diag.FromErr(fmt.Errorf("failed to marshal payload: %s", err))
-	}
-
-	req, err := http.NewRequest("PUT", fmt.Sprintf("%s/api/sites/%s", m.(*Config).APIURL, d.Id()), bytes.NewBuffer(jsonPayload))
-	if err != nil {
-		return diag.FromErr(fmt.Errorf("failed to create request: %s", err))
-	}
-
-	req.Header.Set("Accept", "application/json")
-	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", m.(*Config).APIKey))
-
-	retryClient := retryablehttp.NewClient()
-	retryClient.RetryMax = 10
-	client := retryClient.StandardClient() // *http.Client
-	resp, err := client.Do(req)
-	if err != nil {
-		return diag.FromErr(fmt.Errorf("failed to update site: %s", err))
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		var apiErrResp struct {
-			Message string              `json:"message"`
-			Errors  map[string][]string `json:"errors"`
-		}
-		if err := json.NewDecoder(resp.Body).Decode(&apiErrResp); err != nil {
-			return diag.FromErr(fmt.Errorf("failed to update site, status code %d, unable to parse error response: %s", resp.StatusCode, err))
-		}
-
-		errMsg := "API errors:"
-		for field, messages := range apiErrResp.Errors {
-			for _, msg := range messages {
-				errMsg += fmt.Sprintf("\n- %s: %s", field, msg)
-			}
-		}
-		return diag.FromErr(fmt.Errorf("API returned errors: %s Status Code: %d\n Response body: %s", errMsg, resp.StatusCode, apiErrResp.Message))
-	}
-
-	return resourceSiteRead(ctx, d, m)
-}
-
-func resourceSiteDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	config := m.(*Config)
-
-	req, err := http.NewRequest("DELETE", fmt.Sprintf("%s/api/sites/%s", config.APIURL, d.Id()), nil)
-	if err != nil {
-		return diag.FromErr(fmt.Errorf("failed to create request: %s", err))
-	}
-
-	req.Header.Set("Accept", "application/json")
-	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", config.APIKey))
-
-	retryClient := retryablehttp.NewClient()
-	retryClient.RetryMax = 10
-	client := retryClient.StandardClient() // *http.Client
-	resp, err := client.Do(req)
-	if err != nil {
-		return diag.FromErr(err)
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusNoContent && resp.StatusCode != http.StatusNotFound {
-		var apiErrResp struct {
-			Message string              `json:"message"`
-			Errors  map[string][]string `json:"errors"`
-		}
-		if err := json.NewDecoder(resp.Body).Decode(&apiErrResp); err != nil {
-			return diag.FromErr(fmt.Errorf("failed to delete site, status code %d, unable to parse error response: %s", resp.StatusCode, err))
-		}
-
-		errMsg := "API errors:"
-		for field, messages := range apiErrResp.Errors {
-			for _, msg := range messages {
-				errMsg += fmt.Sprintf("\n- %s: %s", field, msg)
-			}
-		}
-		return diag.FromErr(fmt.Errorf("API returned errors: %s Status Code: %d\n Response body: %s", errMsg, resp.StatusCode, apiErrResp.Message))
-	}
-
-	d.SetId("")
+	// return resourceSiteRead(ctx, d, m)
 	return nil
+
 }
+
+// func resourceOhdearSiteDiff(_ context.Context, d *schema.ResourceDiff, meta interface{}) error {
+// 	checks := d.Get("checks").([]interface{})
+// 	if len(checks) == 0 {
+// 		isHTTPS := strings.HasPrefix(d.Get("url").(string), "https")
+// 		checks = append(checks, map[string]bool{
+// 			ohdear.UptimeCheck:                  true,
+// 			ohdear.BrokenLinksCheck:             true,
+// 			ohdear.CertificateHealthCheck:       isHTTPS,
+// 			ohdear.CertificateTransparencyCheck: isHTTPS,
+// 			ohdear.MixedContentCheck:            isHTTPS,
+// 			ohdear.PerformanceCheck:             true,
+// 			ohdear.DNSCheck:                     true,
+// 			ohdear.LighthouseCheck:              true,
+// 			ohdear.ApplicationHealth:            true,
+// 			ohdear.Sitemap:                      true,
+// 			ohdear.Domain:                       true,
+// 			ohdear.Cron:                         true,
+// 		})
+
+// 		if err := d.SetNew("checks", checks); err != nil {
+// 			return err
+// 		}
+// 	}
+
+// 	// set team_id from provider default if not provided
+// 	if d.Get("team_id") == 0 {
+// 		return d.SetNew("team_id", meta.(*Config).teamID)
+// 	}
+
+// 	return nil
+// }
+
+// func resourceSiteRead(_ context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+// 	// Implementa la logica di lettura della risorsa qui
+// 	return diag.Diagnostics{}
+// }
+
+// func resourceSiteUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+
+// 	payload := map[string]any{
+// 		"url": d.Get("url").(string),
+// 	}
+
+// 	payload["checks"] = buildChecksPayload(d)
+
+// 	if v, ok := d.GetOk("friendly_name"); ok {
+// 		payload["friendly_name"] = v.(string)
+// 	}
+// 	if v, ok := d.GetOk("tags"); ok {
+// 		payload["tags"] = v.([]interface{})
+// 	}
+
+// 	if uptimeConfig, ok := d.GetOk("uptime"); ok {
+// 		uptimeList := uptimeConfig.([]interface{})
+// 		if len(uptimeList) > 0 {
+// 			uptimeMap := uptimeList[0].(map[string]interface{})
+// 			if v, ok := uptimeMap["check_valid_status_codes"]; ok {
+// 				payload["uptime_check_valid_status_codes"] = v.([]interface{})
+// 			} else {
+// 				payload["uptime_check_valid_status_codes"] = []interface{}{"2*"}
+// 			}
+
+// 			if v, ok := uptimeMap["http_client_headers"]; ok {
+// 				headers := v.([]interface{})
+// 				headerPayload := []map[string]string{}
+// 				for _, header := range headers {
+// 					headerMap := header.(map[string]interface{})
+// 					headerPayload = append(headerPayload, map[string]string{
+// 						"name":  headerMap["name"].(string),
+// 						"value": headerMap["value"].(string),
+// 					})
+// 				}
+// 				payload["http_client_headers"] = headerPayload
+// 			}
+// 			if v, ok := uptimeMap["check_location"]; ok {
+// 				payload["uptime_check_location"] = v.(string)
+// 			}
+// 			if v, ok := uptimeMap["check_failed_notification_threshold"]; ok {
+// 				payload["uptime_check_failed_notification_threshold"] = v.(int)
+// 			}
+// 			if v, ok := uptimeMap["check_http_verb"]; ok {
+// 				payload["uptime_check_http_verb"] = v.(string)
+// 			}
+// 			if v, ok := uptimeMap["check_timeout"]; ok {
+// 				payload["uptime_check_timeout"] = v.(int)
+// 			}
+// 			if v, ok := uptimeMap["check_max_redirect_count"]; ok {
+// 				payload["uptime_check_max_redirect_count"] = v.(int)
+// 			}
+// 			if v, ok := uptimeMap["check_payload"]; ok {
+// 				payload["uptime_check_payload"] = v.([]interface{})
+// 			}
+// 			if v, ok := uptimeMap["check_look_for_string"]; ok {
+// 				payload["uptime_check_look_for_string"] = v.(string)
+// 			}
+// 			if v, ok := uptimeMap["check_absent_string"]; ok {
+// 				payload["uptime_check_absent_string"] = v.(string)
+// 			}
+// 			if v, ok := uptimeMap["check_expected_response_headers"]; ok {
+// 				headers := v.([]interface{})
+// 				headerPayload := []map[string]string{}
+// 				for _, header := range headers {
+// 					headerMap := header.(map[string]interface{})
+// 					headerPayload = append(headerPayload, map[string]string{
+// 						"name":      headerMap["name"].(string),
+// 						"condition": headerMap["condition"].(string),
+// 						"value":     headerMap["value"].(string),
+// 					})
+// 				}
+// 				payload["uptime_check_expected_response_headers"] = headerPayload
+// 			}
+// 		}
+// 	}
+// 	if brokenlunksConfig, ok := d.GetOk("broken_links"); ok {
+// 		uptimeList := brokenlunksConfig.([]interface{})
+// 		if len(uptimeList) > 0 {
+// 			uptimeMap := uptimeList[0].(map[string]any)
+// 			if v, ok := uptimeMap["crawler_headers"]; ok {
+// 				headers := v.([]interface{})
+// 				headerPayload := []map[string]string{}
+// 				for _, header := range headers {
+// 					headerMap := header.(map[string]interface{})
+// 					headerPayload = append(headerPayload, map[string]string{
+// 						"name":  headerMap["name"].(string),
+// 						"value": headerMap["value"].(string),
+// 					})
+// 				}
+// 				payload["crawler_headers"] = headerPayload
+// 			}
+// 		}
+// 	}
+
+// 	jsonPayload, err := json.Marshal(payload)
+// 	if err != nil {
+// 		return diag.FromErr(fmt.Errorf("failed to marshal payload: %s", err))
+// 	}
+
+// 	req, err := http.NewRequest("PUT", fmt.Sprintf("%s/api/sites/%s", m.(*Config).APIURL, d.Id()), bytes.NewBuffer(jsonPayload))
+// 	if err != nil {
+// 		return diag.FromErr(fmt.Errorf("failed to create request: %s", err))
+// 	}
+
+// 	req.Header.Set("Accept", "application/json")
+// 	req.Header.Set("Content-Type", "application/json")
+// 	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", m.(*Config).APIKey))
+
+// 	retryClient := retryablehttp.NewClient()
+// 	retryClient.RetryMax = 10
+// 	client := retryClient.StandardClient() // *http.Client
+// 	resp, err := client.Do(req)
+// 	if err != nil {
+// 		return diag.FromErr(fmt.Errorf("failed to update site: %s", err))
+// 	}
+// 	defer resp.Body.Close()
+
+// 	if resp.StatusCode != http.StatusOK {
+// 		var apiErrResp struct {
+// 			Message string              `json:"message"`
+// 			Errors  map[string][]string `json:"errors"`
+// 		}
+// 		if err := json.NewDecoder(resp.Body).Decode(&apiErrResp); err != nil {
+// 			return diag.FromErr(fmt.Errorf("failed to update site, status code %d, unable to parse error response: %s", resp.StatusCode, err))
+// 		}
+
+// 		errMsg := "API errors:"
+// 		for field, messages := range apiErrResp.Errors {
+// 			for _, msg := range messages {
+// 				errMsg += fmt.Sprintf("\n- %s: %s", field, msg)
+// 			}
+// 		}
+// 		return diag.FromErr(fmt.Errorf("API returned errors: %s Status Code: %d\n Response body: %s", errMsg, resp.StatusCode, apiErrResp.Message))
+// 	}
+
+// 	return resourceSiteRead(ctx, d, m)
+// }
+
+// func resourceSiteDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+// 	config := m.(*Config)
+
+// 	req, err := http.NewRequest("DELETE", fmt.Sprintf("%s/api/sites/%s", config.APIURL, d.Id()), nil)
+// 	if err != nil {
+// 		return diag.FromErr(fmt.Errorf("failed to create request: %s", err))
+// 	}
+
+// 	req.Header.Set("Accept", "application/json")
+// 	req.Header.Set("Content-Type", "application/json")
+// 	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", config.APIKey))
+
+// 	retryClient := retryablehttp.NewClient()
+// 	retryClient.RetryMax = 10
+// 	client := retryClient.StandardClient() // *http.Client
+// 	resp, err := client.Do(req)
+// 	if err != nil {
+// 		return diag.FromErr(err)
+// 	}
+// 	defer resp.Body.Close()
+
+// 	if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusNoContent && resp.StatusCode != http.StatusNotFound {
+// 		var apiErrResp struct {
+// 			Message string              `json:"message"`
+// 			Errors  map[string][]string `json:"errors"`
+// 		}
+// 		if err := json.NewDecoder(resp.Body).Decode(&apiErrResp); err != nil {
+// 			return diag.FromErr(fmt.Errorf("failed to delete site, status code %d, unable to parse error response: %s", resp.StatusCode, err))
+// 		}
+
+// 		errMsg := "API errors:"
+// 		for field, messages := range apiErrResp.Errors {
+// 			for _, msg := range messages {
+// 				errMsg += fmt.Sprintf("\n- %s: %s", field, msg)
+// 			}
+// 		}
+// 		return diag.FromErr(fmt.Errorf("API returned errors: %s Status Code: %d\n Response body: %s", errMsg, resp.StatusCode, apiErrResp.Message))
+// 	}
+
+// 	d.SetId("")
+// 	return nil
+// }
