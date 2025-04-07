@@ -51,7 +51,8 @@ func Provider() *schema.Provider {
 			},
 		},
 		ResourcesMap: map[string]*schema.Resource{
-			"ohdear_site": resourceSite(),
+			"ohdear_site":        resourceSite(),
+			"ohdear_status_page": resourceStatusPage(),
 		},
 		ConfigureContextFunc: providerConfigure,
 	}
@@ -60,9 +61,9 @@ func Provider() *schema.Provider {
 func providerConfigure(_ context.Context, d *schema.ResourceData) (interface{}, diag.Diagnostics) {
 	ua := fmt.Sprintf(
 		"terraform-provider-ohdear/%s (https://github.com/bax-energy/terraform-provider-ohdear)",
-		runtime.Version,
+		runtime.Version(),
 	)
-	client := ohdear.NewClient(d.Get("api_url").(string), d.Get("api_token").(string))
+	client := ohdear.NewClient(d.Get("api_url").(string), d.Get("api_key").(string))
 	client.SetUserAgent(ua)
 
 	return &Config{

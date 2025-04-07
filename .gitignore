@@ -33,3 +33,4 @@ website/vendor
 
 # do not commit secrets
 .env
+locals/*
