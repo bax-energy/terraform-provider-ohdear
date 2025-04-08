@@ -1,10 +1,6 @@
 package provider
 
-import (
-	"terraform-provider-ohdear/pkg/ohdear"
-)
-
 type Config struct {
-	client *ohdear.Client
+	client *Client
 	teamID string
 }

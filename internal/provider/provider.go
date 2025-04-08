@@ -6,8 +6,6 @@ import (
 	"runtime"
 	"strings"
 
-	"terraform-provider-ohdear/pkg/ohdear"
-
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
@@ -79,7 +77,7 @@ func providerConfigure(_ context.Context, d *schema.ResourceData) (interface{}, 
 		return nil, diag.Errorf("team_id must be a non-empty string")
 	}
 
-	client := ohdear.NewClient(apiURL, apiKey)
+	client := NewClient(apiURL, apiKey)
 	client.SetUserAgent(ua)
 
 	return &Config{
