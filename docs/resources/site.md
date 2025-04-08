@@ -131,7 +131,7 @@ Optional:
 - `check_max_redirect_count` (Number) The maximum number of redirects to follow. Defaults to `5`.
 - `check_payload` (Block List) The payload to send with the check. (see [below for nested schema](#nestedblock--uptime--check_payload))
 - `check_timeout` (Number) The timeout for the check. Seconds Defaults to `5`.
-- `check_valid_status_codes` (List of String) A list of valid status codes for the uptime check. You can specify a comma separated list and use wildcards. '2*' means everything in the 200 range.
+- `check_valid_status_codes` (List of String) You can specify a comma separated list and use wildcards. '2*' means everything in the 200 range.
 - `http_client_headers` (Block List) A list of HTTP client headers to be sent with the requests. (see [below for nested schema](#nestedblock--uptime--http_client_headers))
 
 <a id="nestedblock--uptime--check_expected_response_headers"></a>
@@ -139,7 +139,7 @@ Optional:
 
 Required:
 
-- `condition` (String) The condition to check for the response header. Values: contains,not contains,equals,matches pattern
+- `condition` (String) Values: contains,not contains,equals,matches pattern
 - `name` (String) The name of the response header.
 - `value` (String) The value of the response header.
 
