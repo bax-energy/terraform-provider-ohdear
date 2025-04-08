@@ -2,7 +2,7 @@ name: "CodeQL"
 
 on:
   push:
-    branches: [ "stopped" ] #stopped for now 
+    branches: [ "stopped" ] #stopped for now will add whn move as public repos
   # push:
   #   branches: [ "stopped" ] #stopped for now 
   # pull_request:

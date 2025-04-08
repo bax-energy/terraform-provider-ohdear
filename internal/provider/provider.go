@@ -49,8 +49,7 @@ func Provider() *schema.Provider {
 			},
 		},
 		ResourcesMap: map[string]*schema.Resource{
-			"ohdear_site":        resourceSite(),
-			"ohdear_status_page": resourceStatusPage(),
+			"ohdear_site": resourceSite(),
 		},
 		ConfigureContextFunc: providerConfigure,
 	}

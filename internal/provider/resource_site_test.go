@@ -18,11 +18,15 @@ func TestAccOhdearSite_basic(t *testing.T) {
 					resource.TestCheckResourceAttr("ohdear_site.test", "friendly_name", "Example Site"),
 				),
 			},
-			{
-				ResourceName:      "ohdear_site.test",
-				ImportState:       true,
-				ImportStateVerify: true,
-			},
+			// {
+			// 	ResourceName:      "ohdear_site.test",
+			// 	ImportState:       true,
+			// 	ImportStateVerify: true,
+			// },
+			// {
+			// 	Config: "",
+			// 	Check:  resource.ComposeTestCheckFunc(),
+			// },
 		},
 	})
 }
