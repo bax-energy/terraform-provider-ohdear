@@ -63,11 +63,27 @@ func providerConfigure(_ context.Context, d *schema.ResourceData) (interface{}, 
 		"terraform-provider-ohdear/%s (https://github.com/bax-energy/terraform-provider-ohdear)",
 		runtime.Version(),
 	)
-	client := ohdear.NewClient(d.Get("api_url").(string), d.Get("api_key").(string))
+
+	apiURL, ok := d.Get("api_url").(string)
+	if !ok || apiURL == "" {
+		return nil, diag.Errorf("api_url must be a non-empty string")
+	}
+
+	apiKey, ok := d.Get("api_key").(string)
+	if !ok || apiKey == "" {
+		return nil, diag.Errorf("api_key must be a non-empty string")
+	}
+
+	teamID, ok := d.Get("team_id").(string)
+	if !ok || teamID == "" {
+		return nil, diag.Errorf("team_id must be a non-empty string")
+	}
+
+	client := ohdear.NewClient(apiURL, apiKey)
 	client.SetUserAgent(ua)
 
 	return &Config{
 		client: client,
-		teamID: d.Get("team_id").(string),
+		teamID: teamID,
 	}, nil
 }

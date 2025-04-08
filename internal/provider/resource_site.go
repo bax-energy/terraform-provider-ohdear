@@ -314,6 +314,7 @@ func resourceSite() *schema.Resource {
 		},
 	}
 }
+
 func resourceOhdearSiteDiff(_ context.Context, d *schema.ResourceDiff, m interface{}) error {
 	checks := d.Get("checks").([]interface{})
 	if len(checks) == 0 {
@@ -346,6 +347,7 @@ func resourceOhdearSiteDiff(_ context.Context, d *schema.ResourceDiff, m interfa
 
 	return nil
 }
+
 func resourceSiteCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 
 	client := m.(*Config).client
@@ -363,7 +365,7 @@ func resourceSiteCreate(ctx context.Context, d *schema.ResourceData, m interface
 
 }
 
-func resourceSiteRead(_ context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+func resourceSiteRead(_ context.Context, _ *schema.ResourceData, _ interface{}) diag.Diagnostics {
 	// Implementa la logica di lettura della risorsa qui
 	return diag.Diagnostics{}
 }

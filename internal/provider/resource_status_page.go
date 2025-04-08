@@ -152,7 +152,7 @@ func resourceStatusPageDelete(_ context.Context, d *schema.ResourceData, m inter
 	return nil
 }
 
-func BuildStatusPage(d *schema.ResourceData, action string) map[string]interface{} {
+func BuildStatusPage(d *schema.ResourceData, _ string) map[string]interface{} {
 	payload := map[string]interface{}{
 		"title":   d.Get("title").(string),
 		"team_id": d.Get("team_id").(string),
