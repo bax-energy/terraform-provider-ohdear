@@ -127,7 +127,7 @@ func resourceSite() *schema.Resource {
 						"check_valid_status_codes": {
 							Type:        schema.TypeList,
 							Optional:    true,
-							Description: "A list of valid status codes for the uptime check. You can specify a comma separated list and use wildcards. '2*' means everything in the 200 range.",
+							Description: "You can specify a comma separated list and use wildcards. '2*' means everything in the 200 range.",
 							Elem: &schema.Schema{
 								Type: schema.TypeString,
 							},
@@ -226,7 +226,7 @@ func resourceSite() *schema.Resource {
 									"condition": {
 										Type:        schema.TypeString,
 										Required:    true,
-										Description: "The condition to check for the response header. Values: contains,not contains,equals,matches pattern",
+										Description: "Values: contains,not contains,equals,matches pattern",
 									},
 									"value": {
 										Type:        schema.TypeString,
@@ -349,7 +349,6 @@ func resourceOhdearSiteDiff(_ context.Context, d *schema.ResourceDiff, m interfa
 }
 
 func resourceSiteCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-
 	client := m.(*Config).client
 
 	payload := BuildPayload(d, "create")
@@ -362,7 +361,6 @@ func resourceSiteCreate(ctx context.Context, d *schema.ResourceData, m interface
 	d.SetId(fmt.Sprintf("%d", site.ID))
 
 	return resourceSiteRead(ctx, d, m)
-
 }
 
 func resourceSiteRead(_ context.Context, _ *schema.ResourceData, _ interface{}) diag.Diagnostics {
@@ -371,7 +369,6 @@ func resourceSiteRead(_ context.Context, _ *schema.ResourceData, _ interface{}) 
 }
 
 func resourceSiteUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-
 	client := m.(*Config).client
 
 	payload := BuildPayload(d, "update")

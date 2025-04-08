@@ -146,7 +146,6 @@ func BuildPayload(d *schema.ResourceData, event string) map[string]interface{} {
 	}
 	if d.Get("team_id") != nil && event == "create" {
 		payloadFragments = append(payloadFragments, map[string]interface{}{"team_id": d.Get("team_id").(string)})
-
 	}
 	if v, ok := d.GetOk("friendly_name"); ok {
 		payloadFragments = append(payloadFragments, map[string]interface{}{"friendly_name": v.(string)})

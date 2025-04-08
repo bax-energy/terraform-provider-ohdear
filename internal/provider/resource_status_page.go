@@ -56,6 +56,7 @@ func resourceStatusPage() *schema.Resource {
 		},
 	}
 }
+
 func resourceOhdearStatusPageDiff(_ context.Context, d *schema.ResourceDiff, m interface{}) error {
 	// set team_id from provider default if not provided
 	if v, ok := d.GetOk("team_id"); !ok || v.(string) == "" {
@@ -66,6 +67,7 @@ func resourceOhdearStatusPageDiff(_ context.Context, d *schema.ResourceDiff, m i
 
 	return nil
 }
+
 func resourceStatusPageCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	client := m.(*Config).client
 
@@ -81,7 +83,7 @@ func resourceStatusPageCreate(ctx context.Context, d *schema.ResourceData, m int
 	return resourceStatusPageRead(ctx, d, m)
 }
 
-func resourceStatusPageRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+func resourceStatusPageRead(_ context.Context, _ *schema.ResourceData, _ interface{}) diag.Diagnostics {
 	// Implement the logic to read the resource here
 	return diag.Diagnostics{}
 }
@@ -91,9 +93,9 @@ func resourceStatusPageUpdate(ctx context.Context, d *schema.ResourceData, m int
 
 	if d.HasChange("sites") {
 		// Get the current state of sites
-		old, new := d.GetChange("sites")
+		old, newSitesData := d.GetChange("sites")
 		oldSites := old.([]interface{})
-		newSites := new.([]interface{})
+		newSites := newSitesData.([]interface{})
 
 		// Remove all existing sites
 		for _, site := range oldSites {
