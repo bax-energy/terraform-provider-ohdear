@@ -1,8 +1,8 @@
 name: 'Close stale issues and PRs'
 on:
   workflow_dispatch:
-  # schedule:
-  #   - cron: '30 1 * * *'
+  schedule:
+    - cron: '30 1 * * 0' # Updated to run every Sunday at 1:30 AM
 
 jobs:
   stale:
