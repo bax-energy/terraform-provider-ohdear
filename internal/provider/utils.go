@@ -20,7 +20,7 @@ func buildChecks(d *schema.ResourceData) map[string]interface{} {
 	return payload
 }
 
-// helper per estrarre headers generici
+// helper to extract generic headers
 func extractHeaders(headers []interface{}) []map[string]string {
 	headerPayload := []map[string]string{}
 	for _, header := range headers {
@@ -33,7 +33,7 @@ func extractHeaders(headers []interface{}) []map[string]string {
 	return headerPayload
 }
 
-// helper per estrarre expected response headers
+// helper to extract expected response headers
 func extractExpectedResponseHeaders(headers []interface{}) []map[string]string {
 	headerPayload := []map[string]string{}
 	for _, header := range headers {
@@ -47,7 +47,7 @@ func extractExpectedResponseHeaders(headers []interface{}) []map[string]string {
 	return headerPayload
 }
 
-// helper per ottenere valore con default
+// helper to get value with default
 func getOrDefault(m map[string]interface{}, key string, defaultValue interface{}) interface{} {
 	if v, ok := m[key]; ok {
 		return v
@@ -75,7 +75,7 @@ func buildUptime(d *schema.ResourceData) map[string]interface{} {
 		payload["uptime_check_expected_response_headers"] = extractExpectedResponseHeaders(headers.([]interface{}))
 	}
 
-	// lista semplice di campi da copiare direttamente se presenti
+	// simple list of fields to copy directly if present
 	simpleFields := []string{
 		"check_location",
 		"check_failed_notification_threshold",

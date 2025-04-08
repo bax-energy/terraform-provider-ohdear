@@ -69,24 +69,20 @@ func resourceOhdearStatusPageDiff(_ context.Context, d *schema.ResourceDiff, m i
 func resourceStatusPageCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	client := m.(*Config).client
 
-	// Costruisci il payload per la creazione
 	payload := BuildStatusPage(d, "create")
 
-	// Invia il payload al client per creare la status page
 	statusPage, err := client.AddStatusPage(payload)
 	if err != nil {
 		return diagErrorf(err, "Could not add status page to Oh Dear")
 	}
 
-	// Imposta l'ID della risorsa nello stato Terraform
 	d.SetId(fmt.Sprintf("%d", statusPage.ID))
 
-	// Leggi i dati della risorsa appena creata per sincronizzarli con lo stato Terraform
 	return resourceStatusPageRead(ctx, d, m)
 }
 
 func resourceStatusPageRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	// Implementa la logica di lettura della risorsa qui
+	// Implement the logic to read the resource here
 	return diag.Diagnostics{}
 }
 
