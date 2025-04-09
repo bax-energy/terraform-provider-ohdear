@@ -14,6 +14,7 @@ generate:
 
 fmt:
 	gofmt -s -w -e .
+	gofumpt -w .
 
 test:
 	go test -v -cover -timeout=120s -parallel=10 ./...

@@ -1,3 +1,7 @@
-If you discover a security issue in this repo, please submit it through placeholder@baxenergy.com
+# Security Policy
+
+If you discover a security vulnerability in this repository, please report it responsibly.
+
+To report a security issue, please email **security@baxenergy.com**. We will review your report promptly and take the necessary actions.
 
 Thanks for helping make this project safe for everyone.

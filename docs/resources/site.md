@@ -47,6 +47,7 @@ resource "ohdear_site" "example2" {
 
 ### Optional
 
+- `application_health` (Block List, Max: 1) application_health configuration. (see [below for nested schema](#nestedblock--application_health))
 - `broken_links` (Block List, Max: 1) broken_links configuration. (see [below for nested schema](#nestedblock--broken_links))
 - `checks` (Block List, Max: 1) The list of checks to be performed on the site. (see [below for nested schema](#nestedblock--checks))
 - `friendly_name` (String) If you specify a friendly name we'll display this instead of the url.
@@ -57,6 +58,28 @@ resource "ohdear_site" "example2" {
 ### Read-Only
 
 - `id` (String) The ID of this resource.
+
+<a id="nestedblock--application_health"></a>
+### Nested Schema for `application_health`
+
+Required:
+
+- `check_result_url` (String) The URL to check the application health.
+
+Optional:
+
+- `headers` (Block List) A list of HTTP client headers to be sent with the requests. (see [below for nested schema](#nestedblock--application_health--headers))
+- `secret` (String) the secret to use for the application health check.
+
+<a id="nestedblock--application_health--headers"></a>
+### Nested Schema for `application_health.headers`
+
+Required:
+
+- `name` (String) The name of the HTTP header.
+- `value` (String) The value of the HTTP header.
+
+
 
 <a id="nestedblock--broken_links"></a>
 ### Nested Schema for `broken_links`
@@ -99,16 +122,16 @@ Optional:
 
 Optional:
 
-- `check_absent_string` (String) Verify absence of text on response. The string that should be absent in the response.
+- `check_absent_string` (String) Verify absence of text on response. The string that should be absent in the response. Defaults to ``.
 - `check_expected_response_headers` (Block List) Verify headers on response. The expected response headers. (see [below for nested schema](#nestedblock--uptime--check_expected_response_headers))
-- `check_failed_notification_threshold` (Number) The threshold for failed notifications. Minutes
-- `check_http_verb` (String) The HTTP verb to use for the check. Values: GET, POST, PUT, PATCH
-- `check_location` (String) We can check your server from all over the world.
-- `check_look_for_string` (String) Verify text on response. The string to look for in the response.
-- `check_max_redirect_count` (Number) The maximum number of redirects to follow.
+- `check_failed_notification_threshold` (Number) The threshold for failed notifications. Minutes Defaults to `2`.
+- `check_http_verb` (String) The HTTP verb to use for the check. Values: GET, POST, PUT, PATCH Defaults to `get`.
+- `check_location` (String) We can check your server from all over the world. Defaults to `paris`.
+- `check_look_for_string` (String) Verify text on response. The string to look for in the response. Defaults to ``.
+- `check_max_redirect_count` (Number) The maximum number of redirects to follow. Defaults to `5`.
 - `check_payload` (Block List) The payload to send with the check. (see [below for nested schema](#nestedblock--uptime--check_payload))
-- `check_timeout` (Number) The timeout for the check. Seconds
-- `check_valid_status_codes` (List of String) A list of valid status codes for the uptime check. You can specify a comma separated list and use wildcards. '2*' means everything in the 200 range.
+- `check_timeout` (Number) The timeout for the check. Seconds Defaults to `5`.
+- `check_valid_status_codes` (List of String) You can specify a comma separated list and use wildcards. '2*' means everything in the 200 range.
 - `http_client_headers` (Block List) A list of HTTP client headers to be sent with the requests. (see [below for nested schema](#nestedblock--uptime--http_client_headers))
 
 <a id="nestedblock--uptime--check_expected_response_headers"></a>
@@ -116,7 +139,7 @@ Optional:
 
 Required:
 
-- `condition` (String) The condition to check for the response header. Values: contains,not contains,equals,matches pattern
+- `condition` (String) Values: contains,not contains,equals,matches pattern
 - `name` (String) The name of the response header.
 - `value` (String) The value of the response header.
 

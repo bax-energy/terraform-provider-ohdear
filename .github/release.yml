@@ -4,30 +4,28 @@ changelog:
   categories:
     - title: 💥 Breaking Changes
       labels:
-        - "Type: Breaking change"
+        - "enhancement" # Use this for breaking changes
 
     - title: 🚀 New Features
       labels:
-        - "Type: Feature"
-        - "New data source"
-        - "New resource"
+        - "enhancement" # Use this for new features
 
     - title: 🐛 Bugfixes
       labels:
-        - "Type: Bug"
+        - "bug"
 
     - title: 🪦 Deprecations
       labels:
-        - "Deprecation"
+        - "wontfix" # Use this for deprecations
 
     - title: 🛠️ Maintenance
       labels:
-        - "Type: Maintenance"
         - "dependencies"
+        - "github_actions"
 
     - title: 📝 Documentation
       labels:
-        - "Type: Documentation"
+        - "documentation"
 
     - title: 🏷 Other Changes
       labels:

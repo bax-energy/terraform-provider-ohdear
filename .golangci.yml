@@ -1,26 +1,26 @@
-# Visit https://golangci-lint.run/ for usage documentation
-# and information on other useful linters
-issues:
-  max-issues-per-linter: 0
-  max-same-issues: 0
-
 linters:
-  disable-all: true
+  presets:
+    - bugs
+    - error
+    - performance
   enable:
-    - durationcheck
-    - errcheck
-    - copyloopvar
-    - forcetypeassert
-    - godot
     - gofmt
-    - gosimple
-    - ineffassign
-    - makezero
+    - gofumpt
+    - revive
+    - gocyclo
     - misspell
-    - nilerr
-    - predeclared
-    - staticcheck
-    - unconvert
-    - unparam
-    - unused
-    - usetesting
+    - whitespace
+    - goimports
+    - gosec
+    - lll
+  disable:
+    - rowserrcheck
+    - sqlclosecheck
+    - wrapcheck
+    - perfsprint
+
+issues:
+  exclude-rules:
+    - path: _test\.go
+      linters:
+        - err113

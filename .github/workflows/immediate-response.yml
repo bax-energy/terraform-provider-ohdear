@@ -19,11 +19,10 @@ jobs:
         run: echo "NUMBER=${{ github.event.issue.number || github.event.pull_request.number }}" >> "$GITHUB_OUTPUT"
 
       - name: Respond to issue or PR
-        uses: peter-evans/create-or-update-comment@v4
+        uses: peter-evans/create-or-update-comment@v4.0.0
         with:
           issue-number: ${{ steps.extract.outputs.NUMBER }}
           body: >
-            👋 Hi! Thank you for this contribution! Just to let you know, our GitHub SDK team does a round of issue and PR reviews twice a week, every Monday and Friday!
-            We have a process for prioritizing and responding to your input. 
-            Because you are a part of this community please feel free to comment, add to, or pick up any issues/PRs that are labeled with `Status: Up for grabs`.
-            You & others like you are the reason all of this works! So thank you & happy coding! 🚀
+            👋 Hi there! Thanks for contributing! Our team reviews issues and PRs every Monday and Friday. 
+            Feel free to engage with issues labeled `Status: Up for grabs`—your input makes a difference! 
+            We appreciate your support and happy coding! 🚀

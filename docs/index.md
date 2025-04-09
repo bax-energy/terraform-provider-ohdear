@@ -36,9 +36,9 @@ provider "ohdear" {
 
 ### Required
 
-- `api_key` (String) Oh Dear API token
-- `team_id` (String) The default team ID to use for sites
+- `api_key` (String) Oh Dear API token. If not set, uses `OHDEAR_TOKEN` env var
+- `team_id` (String) The default team ID to use for sites. If not set, uses `OHDEAR_TEAM_ID` env var.
 
 ### Optional
 
-- `api_url` (String) Oh Dear API URL
+- `api_url` (String) Oh Dear API URL. If not set, uses `OHDEAR_API_URL` env var. Defaults to `https://ohdear.app`.
