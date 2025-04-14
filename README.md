@@ -10,6 +10,10 @@
 
 This project is used to manipulate Ohdear resources (repositories, teams, files, etc.) using Terraform. Its Terraform Registry page can be found [here](https://registry.terraform.io/providers/integrations/ohdear).
 
+## Support
+
+This is an independent, non-commercial utility created by BaxEnergy. BaxEnergy is not obligated to provide enterprise support or maintenance guarantees beyond voluntary contributions.
+
 ## Requirements
 
 -	[Terraform](https://www.terraform.io/downloads.html) >= 0.12.x
@@ -38,13 +42,10 @@ Detailed documentation for the Ohdear provider can be found [here](https://regis
 
 ## Contributing
 
-Detailed documentation for contributing to the Ohdear provider can be found [here](CONTRIBUTING.md).
-
-## Support
-
-This is a community-supported project. The Baxenergy Maintainer team triages issues and PRs every Monday and Friday. 
-- To report issues or request features, please use the [Issues](https://github.com/your-repo/issues) section.
+- To report issues or request features, please use the [Issues](https://github.com/bax-energy/terraform-provider-ohdear/issues) section.
 - Pull requests are always welcome!
+
+Detailed documentation for contributing to the Ohdear provider can be found [here](CONTRIBUTING.md).
 
 ## License
 
