@@ -22,10 +22,6 @@
 
 Please adhere to our [Code of Conduct](./CODE_OF_CONDUCT.md). Respectful and inclusive behavior is expected at all times. Harassment or inappropriate conduct will not be tolerated.
 
-## :bulb: Asking Questions
-
-For general questions, refer to our [Support Guide](./SUPPORT.md). GitHub issues should be reserved for bug reports and feature requests.
-
 ## :inbox_tray: Opening an Issue
 
 Before opening an issue, ensure you are using the latest version of the project. If the issue persists, follow these steps:
