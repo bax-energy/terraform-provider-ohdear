@@ -8,7 +8,7 @@
 
 <img src="https://raw.githubusercontent.com/hashicorp/terraform-website/d841a1e5fca574416b5ca24306f85a0f4f41b36d/content/source/assets/images/logo-terraform-main.svg" alt="Terraform Logo" width="300px">
 
-This project is used to manipulate Ohdear resources (repositories, teams, files, etc.) using Terraform. Its Terraform Registry page can be found [here](https://registry.terraform.io/providers/integrations/ohdear).
+This project is used to manipulate Ohdear resources (repositories, teams, files, etc.) using Terraform. Its Terraform Registry page can be found [here](https://registry.terraform.io/providers/bax-energy/ohdear).
 
 ## Support
 
@@ -34,11 +34,7 @@ resource "ohdear_site" "example" {
 }
 ```
 
-For more examples, refer to the [documentation](https://registry.terraform.io/providers/integrations/ohdear).
-
-## Usage
-
-Detailed documentation for the Ohdear provider can be found [here](https://registry.terraform.io/providers/integrations/ohdear).
+For more examples, refer to the [documentation](https://registry.terraform.io/providers/bax-energy/ohdear/latest/docs).
 
 ## Contributing
 
