@@ -32,8 +32,8 @@ func Provider() *schema.Provider {
 			"api_key": {
 				Type:        schema.TypeString,
 				Required:    true,
-				DefaultFunc: schema.EnvDefaultFunc("OHDEAR_TOKEN", nil),
-				Description: "Oh Dear API token. If not set, uses `OHDEAR_TOKEN` env var",
+				DefaultFunc: schema.EnvDefaultFunc("OHDEAR_APY_KEY", nil),
+				Description: "Oh Dear API token. If not set, uses `OHDEAR_APY_KEY` env var",
 			},
 			"api_url": {
 				Type:        schema.TypeString,

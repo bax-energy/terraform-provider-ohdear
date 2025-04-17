@@ -16,18 +16,17 @@ description: |-
 terraform {
   required_providers {
     ohdear = {
-      source  = "app.terraform.io/bax-energy/ohdear"
-      version = "0.1.0"
+      source  = "bax-energy/ohdear"
+      version = "0.0.10"
     }
   }
 }
 
-provider "ohdear" {} # needs : OHDEAR_TEAM_ID and OHDEAR_TEAM_ID
+provider "ohdear" {} # needs : OHDEAR_APY_KEY and OHDEAR_TEAM_ID
 
 provider "ohdear" {
   api_key = var.api_key # or use environment variable OHDEAR_APY_KEY
   team_id = var.team_id # or use environment variable OHDEAR_TEAM_ID
-  api_url = var.api_url # Optional: or use environment variable OHDEAR_API_URL
 }
 ```
 
@@ -36,7 +35,7 @@ provider "ohdear" {
 
 ### Required
 
-- `api_key` (String) Oh Dear API token. If not set, uses `OHDEAR_TOKEN` env var
+- `api_key` (String) Oh Dear API token. If not set, uses `OHDEAR_APY_KEY` env var
 - `team_id` (String) The default team ID to use for sites. If not set, uses `OHDEAR_TEAM_ID` env var.
 
 ### Optional

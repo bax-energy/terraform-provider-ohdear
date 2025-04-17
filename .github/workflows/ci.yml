@@ -92,5 +92,5 @@ jobs:
       - run: make testacc
         env:
           TF_ACC_TERRAFORM_VERSION: ${{ matrix.terraform }}
-          OHDEAR_TOKEN: ${{ secrets.OHDEAR_TOKEN }}
+          OHDEAR_APY_KEY: ${{ secrets.OHDEAR_TOKEN }}
           OHDEAR_TEAM_ID: ${{ secrets.OHDEAR_TEAM_ID }}

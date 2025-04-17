@@ -35,8 +35,8 @@ func TestProvider_impl(_ *testing.T) {
 }
 
 func testAccPreCheck(t *testing.T) {
-	if v := os.Getenv("OHDEAR_TOKEN"); v == "" {
-		t.Fatal("OHDEAR_TOKEN must be set for acceptance tests")
+	if v := os.Getenv("OHDEAR_APY_KEY"); v == "" {
+		t.Fatal("OHDEAR_APY_KEY must be set for acceptance tests")
 	}
 	if v := os.Getenv("OHDEAR_TEAM_ID"); v == "" {
 		t.Fatal("OHDEAR_TEAM_ID must be set for acceptance tests")
