@@ -1,11 +1,8 @@
 module terraform-provider-ohdear
 
-go 1.24.1
+go 1.25.0
 
-require (
-	github.com/go-resty/resty/v2 v2.16.5
-	github.com/hashicorp/terraform-plugin-sdk/v2 v2.36.1
-)
+require github.com/hashicorp/terraform-plugin-sdk/v2 v2.36.1
 
 require (
 	github.com/ProtonMail/go-crypto v1.1.3 // indirect

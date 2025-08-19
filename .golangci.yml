@@ -1,26 +1,64 @@
+version: "2"
 linters:
-  presets:
-    - bugs
-    - error
-    - performance
   enable:
-    - gofmt
-    - gofumpt
-    - revive
-    - gocyclo
-    - misspell
-    - whitespace
-    - goimports
+    - asasalint
+    - asciicheck
+    - bidichk
+    - bodyclose
+    - contextcheck
+    - durationcheck
+    - err113
+    - errchkjson
+    - errorlint
+    - exhaustive
+    - fatcontext
+    - gocheckcompilerdirectives
+    - gochecksumtype
     - gosec
-    - lll
+    - gosmopolitan
+    - loggercheck
+    - makezero
+    - misspell
+    - musttag
+    - nilerr
+    - nilnesserr
+    - noctx
+    - prealloc
+    - protogetter
+    - reassign
+    - recvcheck
+    - revive
+    - spancheck
+    - testifylint
+    - whitespace
+    - zerologlint
   disable:
+    - perfsprint
     - rowserrcheck
     - sqlclosecheck
     - wrapcheck
-    - perfsprint
-
-issues:
-  exclude-rules:
-    - path: _test\.go
-      linters:
-        - err113
+  exclusions:
+    generated: lax
+    presets:
+      - comments
+      - common-false-positives
+      - legacy
+      - std-error-handling
+    rules:
+      - linters:
+          - err113
+        path: _test\.go
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
+formatters:
+  enable:
+    - gofmt
+    - goimports
+  exclusions:
+    generated: lax
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
