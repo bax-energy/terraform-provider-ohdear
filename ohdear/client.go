@@ -13,7 +13,7 @@ type Client struct {
 	baseURL    string
 	apiKey     string
 
-	Sites SiteService
+	Monitors MonitorService
 }
 
 func NewClient(apiKey string, opts ...func(*Client)) *Client {
@@ -27,7 +27,7 @@ func NewClient(apiKey string, opts ...func(*Client)) *Client {
 		opt(c)
 	}
 
-	c.Sites = &siteService{client: c}
+	c.Monitors = &monitorService{client: c}
 	return c
 }
 
