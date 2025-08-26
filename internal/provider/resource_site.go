@@ -359,12 +359,12 @@ func resourceSiteDiff(_ context.Context, d *schema.ResourceDiff, m interface{}) 
 func resourceSiteCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	client := m.(*Config).client
 
-	req, err := BuildSiteCreateRequest(d)
+	req, err := BuildCreateMonitorRequest(d)
 	if err != nil {
 		return diagErrorf(err, "Could not parse schema to create request")
 	}
 
-	site, err := client.Sites.Create(ctx, req)
+	site, err := client.Monitors.Create(ctx, req)
 	if err != nil {
 		return diagErrorf(err, "Could not add site to Oh Dear")
 	}
@@ -381,14 +381,14 @@ func resourceSiteRead(_ context.Context, _ *schema.ResourceData, _ interface{}) 
 func resourceSiteUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	client := m.(*Config).client
 
-	req := BuildSiteUpdateRequest(d)
+	req := BuildUpdateMonitorRequest(d)
 
 	siteID, err := getSiteID(d)
 	if err != nil {
 		return diagErrorf(err, "Failed to convert site id to int")
 	}
 
-	site, err := client.Sites.Update(ctx, siteID, req)
+	site, err := client.Monitors.Update(ctx, siteID, req)
 	if err != nil {
 		return diagErrorf(err, "Could not add site to Oh Dear")
 	}
@@ -405,7 +405,7 @@ func resourceSiteDelete(ctx context.Context, d *schema.ResourceData, m interface
 	}
 
 	client := m.(*Config).client
-	if err = client.Sites.Delete(ctx, id); err != nil {
+	if err = client.Monitors.Delete(ctx, id); err != nil {
 		return diagErrorf(err, "Could not remove site %d from Oh Dear", id)
 	}
 

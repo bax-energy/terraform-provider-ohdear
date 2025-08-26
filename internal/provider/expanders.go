@@ -126,3 +126,53 @@ func expandPayloads(list []interface{}) []ohdear.Payload {
 	}
 	return out
 }
+
+func getList(m map[string]interface{}, key string) []interface{} {
+	if m == nil {
+		return nil
+	}
+	if v, ok := m[key]; ok && v != nil {
+		if lst, ok := v.([]interface{}); ok {
+			return lst
+		}
+	}
+	return nil
+}
+
+func expandUptimeSettings(m map[string]interface{}) *ohdear.UptimeSettings {
+	s := &ohdear.UptimeSettings{}
+	if v, ok := m["check_location"].(string); ok && v != "" {
+		s.Location = &v
+	}
+	if v, ok := m["check_failed_notification_threshold"].(int); ok {
+		s.FailedNotificationThresh = &v
+	}
+	if v, ok := m["check_http_verb"].(string); ok && v != "" {
+		s.HTTPVerb = &v
+	}
+	if v, ok := m["check_timeout"].(int); ok {
+		s.Timeout = &v
+	}
+	if v, ok := m["check_max_redirect_count"].(int); ok {
+		s.MaxRedirectCount = &v
+	}
+	if v, ok := m["check_payload"]; ok {
+		s.Payload = expandPayloads(v.([]interface{}))
+	}
+	if v, ok := m["check_valid_status_codes"]; ok {
+		s.ValidStatusCodes = expandStringList(v.([]interface{}))
+	}
+	if v, ok := m["check_look_for_string"].(string); ok {
+		s.LookForString = &v
+	}
+	if v, ok := m["check_absent_string"].(string); ok {
+		s.AbsentString = &v
+	}
+	if v, ok := m["check_expected_response_headers"]; ok {
+		s.ExpectedResponseHeaders = expandExpectedHeaders(v.([]interface{}))
+	}
+	if v, ok := m["http_client_headers"]; ok {
+		s.HTTPClientHeaders = expandHeaders(v.([]interface{}))
+	}
+	return s
+}
